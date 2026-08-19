@@ -1,0 +1,64 @@
+@model IEnumerable<EVENTIA.Dtos.ArticuloListItem>
+@{ ViewData["Title"] = "Mi Catálogo"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Mi Catálogo</h2>
+    <a asp-action="Crear" class="btn btn-dark">+ Nuevo Artículo</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Aún no tienes artículos registrados. ¡Crea tu primer artículo!</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio/día</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                            {
+                                <img src="@item.ImagenUrl" style="height:40px; width:60px; object-fit:cover;" class="rounded" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>@item.Nombre</td>
+                        <td>@item.CategoriaNombre</td>
+                        <td>S/ @item.Precio.ToString("F2")</td>
+                        <td>@item.CantidadTotal</td>
+                        <td>
+                            <span class="badge @(item.Activo ? "bg-success" : "bg-secondary")">
+                                @(item.Activo ? "Activo" : "Inactivo")
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-action="Editar" asp-route-id="@item.ArticuloId" class="btn btn-sm btn-outline-dark">Editar</a>
+                            <form asp-action="CambiarEstado" asp-route-id="@item.ArticuloId" asp-route-activo="@item.Activo" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm @(item.Activo ? "btn-outline-danger" : "btn-outline-success")">
+                                    @(item.Activo ? "Desactivar" : "Activar")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

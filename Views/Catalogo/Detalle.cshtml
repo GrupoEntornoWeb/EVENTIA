@@ -1,0 +1,82 @@
+@model EVENTIA.Dtos.ArticuloListItem
+@{ ViewData["Title"] = "Detalle del Artículo"; }
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="row g-0">
+                <div class="col-md-5">
+                    @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+                    {
+                        <img src="@Model.ImagenUrl" class="img-fluid rounded-start h-100" style="object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100" style="min-height:300px;">
+                            <span class="text-muted">Sin imagen</span>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-7">
+                    <div class="card-body">
+                        <span class="badge bg-secondary mb-2">@Model.CategoriaNombre</span>
+                        <h3>@Model.Nombre</h3>
+                        <p class="text-muted">@Model.Descripcion</p>
+                        <hr />
+                        <p><strong>Precio:</strong> S/ @Model.Precio.ToString("F2") / día</p>
+                        <p><strong>Stock total:</strong> @Model.CantidadTotal unidades</p>
+                        <p><strong>Proveedor:</strong> @Model.ProveedorNombre</p>
+
+                        @{
+                            var disponibilidad = ViewBag.Disponibilidad as EVENTIA.Models.Disponibilidad;
+                            var fechaSeleccionada = ViewBag.FechaSeleccionada as DateOnly?;
+                        }
+
+                        @if (fechaSeleccionada.HasValue)
+                        {
+                            <hr />
+                            <p class="text-muted small">Disponibilidad para el @fechaSeleccionada.Value.ToString("dd/MM/yyyy"):</p>
+                            @if (disponibilidad != null)
+                            {
+                                var disponibles = disponibilidad.CantidadDisponible - disponibilidad.CantidadReservada;
+                                <span class="badge @(disponibles > 0 ? "bg-success" : "bg-danger") fs-6">
+                                    @(disponibles > 0 ? $"{disponibles} disponibles" : "Sin stock")
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">No definida</span>
+                            }
+                        }
+
+                        <div class="mt-4">
+                            @if (Context.Session.GetString("TipoPerfil") == "Cliente" && fechaSeleccionada.HasValue && disponibilidad != null)
+                            {
+                                var disponibles = disponibilidad.CantidadDisponible - disponibilidad.CantidadReservada;
+                                if (disponibles > 0)
+                                {
+                                    <form asp-controller="Carrito" asp-action="Agregar" method="post" class="d-flex align-items-center gap-2 mb-2">
+                                        <input type="hidden" name="articuloId" value="@Model.ArticuloId" />
+                                        <input type="hidden" name="nombre" value="@Model.Nombre" />
+                                        <input type="hidden" name="precio" value="@Model.Precio" />
+                                        <input type="hidden" name="proveedorId" value="@Model.ProveedorId" />
+                                        <input type="hidden" name="proveedorNombre" value="@Model.ProveedorNombre" />
+                                        <input type="hidden" name="imagenUrl" value="@Model.ImagenUrl" />
+                                        <label class="form-label mb-0 me-1">Cant:</label>
+                                        <input type="number" name="cantidad" value="1" min="1" max="@disponibles" class="form-control" style="width:70px;" />
+                                        <button type="submit" class="btn btn-success">Agregar al Carrito</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger fs-6">Sin stock para esta fecha</span>
+                                }
+                            }
+                            <a asp-action="Buscar" asp-route-fecha="@(fechaSeleccionada?.ToString("yyyy-MM-dd"))" class="btn btn-outline-secondary">Volver al Catalogo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

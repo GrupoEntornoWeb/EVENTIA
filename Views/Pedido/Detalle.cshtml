@@ -1,0 +1,142 @@
+@model EVENTIA.ViewModels.PedidoDetalleViewModel
+@{ ViewData["Title"] = $"Pedido #{Model.Pedido.PedidoId}"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Pedido #@Model.Pedido.PedidoId</h2>
+    <a asp-action="MisPedidos" class="btn btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span>Detalles del Pedido</span>
+                <span class="badge @GetEstadoBadge(Model.Pedido.Estado)">@Model.Pedido.Estado</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <p><strong>Proveedor:</strong> @Model.Pedido.Proveedor.NombreNegocio</p>
+                        <p><strong>Fecha evento:</strong> @Model.Pedido.FechaEvento.ToString("dd/MM/yyyy")</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><strong>Monto total:</strong> S/ @Model.Pedido.MontoTotal.ToString("F2")</p>
+                        <p><strong>Fecha registro:</strong> @Model.Pedido.FechaPedido.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                </div>
+
+                <h5>Artículos</h5>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Artículo</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in Model.Pedido.DetallePedidos)
+                        {
+                            <tr>
+                                <td>@d.Articulo.Nombre</td>
+                                <td>@d.Cantidad</td>
+                                <td>S/ @d.PrecioUnitario.ToString("F2")</td>
+                                <td>S/ @d.Subtotal.ToString("F2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (Model.Pago != null)
+        {
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">Pago Registrado</div>
+                <div class="card-body">
+                    <p><strong>Monto pagado:</strong> S/ @Model.Pago.MontoPagado.ToString("F2")</p>
+                    <p><strong>Fecha:</strong> @Model.Pago.FechaPago.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Método:</strong> @Model.Pago.MetodoPago</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        @if (Model.EstadosDisponibles.Any())
+        {
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">Acciones</div>
+                <div class="card-body d-grid gap-2">
+                    @foreach (var estado in Model.EstadosDisponibles)
+                    {
+                        if (estado == "Confirmar Pago")
+                        {
+                            <a asp-action="Pago" asp-route-pedidoId="@Model.Pedido.PedidoId" class="btn btn-success">
+                                Confirmar Pago
+                            </a>
+                        }
+                        else if (estado == "Marcar Entregado")
+                        {
+                            var fechaHoy = DateOnly.FromDateTime(DateTime.Today);
+                            if (fechaHoy != Model.Pedido.FechaEvento)
+                            {
+                                <div class="alert alert-warning small mb-2">
+                                    <strong>Atención:</strong> La fecha de hoy (@fechaHoy.ToString("dd/MM/yyyy")) es distinta a la fecha del evento (@Model.Pedido.FechaEvento.ToString("dd/MM/yyyy")).
+                                </div>
+                            }
+                            <form asp-action="Entregar" asp-route-id="@Model.Pedido.PedidoId" method="post">
+                                <button type="submit" class="btn btn-primary w-100"
+                                        onclick="return confirm('¿Marcar como entregado?')">
+                                    Marcar Entregado
+                                </button>
+                            </form>
+                        }
+                        else if (estado == "Registrar Devolución")
+                        {
+                            <form asp-action="Devolver" asp-route-id="@Model.Pedido.PedidoId" method="post">
+                                <div class="mb-2">
+                                    <label class="form-label small">Observaciones (opcional)</label>
+                                    <textarea name="observaciones" class="form-control form-control-sm" rows="2"
+                                              placeholder="Estado del artículo devuelto..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-warning w-100"
+                                        onclick="return confirm('¿Registrar devolución?')">
+                                    Registrar Devolución
+                                </button>
+                            </form>
+                        }
+                        else if (estado == "Reprogramar")
+                        {
+                            <a asp-action="Reprogramar" asp-route-id="@Model.Pedido.PedidoId" class="btn btn-outline-warning">
+                                Reprogramar Fecha
+                            </a>
+                        }
+                        else if (estado == "Cancelar")
+                        {
+                            <form asp-action="Cancelar" asp-route-id="@Model.Pedido.PedidoId" method="post">
+                                <button type="submit" class="btn btn-danger w-100"
+                                        onclick="return confirm('¿Está seguro de cancelar este pedido?')">
+                                    Cancelar Pedido
+                                </button>
+                            </form>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    string GetEstadoBadge(string estado) => estado switch
+    {
+        "Reservado" => "badge-ev-reservado",
+        "Confirmado" => "badge-ev-confirmado",
+        "Entregado" => "badge-ev-entregado",
+        "Devuelto" => "badge-ev-devuelto",
+        "Cancelado" => "badge-ev-cancelado",
+        _ => "bg-secondary"
+    };
+}

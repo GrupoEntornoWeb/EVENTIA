@@ -1,0 +1,405 @@
+/* ============================================================
+   EVENTIA — Design System (based on wireframe identity)
+   Palette: Orange #E8752A / Black #1A1A1A / Cream #F5F0E8
+   Fonts: Barlow Condensed (headings) / Inter (body)
+   ============================================================ */
+
+:root {
+  --ev-orange: #E8752A;
+  --ev-orange-dark: #c95f1f;
+  --ev-black: #1A1A1A;
+  --ev-cream: #F5F0E8;
+  --ev-cream-dark: #E8E0D4;
+  --ev-white: #FFFFFF;
+  --ev-gray: #6c757d;
+  --ev-success: #28a745;
+  --ev-danger: #dc3545;
+  --ev-warning: #ffc107;
+  --ev-info: #17a2b8;
+}
+
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html { font-size: 16px; }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  background-color: var(--ev-cream);
+  font-family: 'Inter', sans-serif;
+  color: var(--ev-black);
+}
+
+h1, h2, h3, h4, h5, h6,
+.eventia-heading {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ---- Navbar ---- */
+.eventia-navbar {
+  background-color: var(--ev-black) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.eventia-brand {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.12em;
+  color: var(--ev-orange) !important;
+}
+.eventia-navbar .nav-link {
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.eventia-navbar .nav-link:hover {
+  color: var(--ev-orange) !important;
+}
+
+/* ---- Footer ---- */
+.eventia-footer {
+  background-color: var(--ev-black);
+}
+
+/* ---- Cards ---- */
+.card {
+  border: none;
+  border-radius: 0.5rem;
+}
+.card.shadow {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+.card-header {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* ---- Buttons ---- */
+.btn-dark {
+  background-color: var(--ev-black);
+  border-color: var(--ev-black);
+}
+.btn-dark:hover {
+  background-color: #333;
+  border-color: #333;
+}
+.btn-outline-dark {
+  color: var(--ev-black);
+  border-color: var(--ev-black);
+}
+.btn-outline-dark:hover {
+  background-color: var(--ev-black);
+  color: var(--ev-white);
+}
+.btn-primary {
+  background-color: var(--ev-orange);
+  border-color: var(--ev-orange);
+}
+.btn-primary:hover {
+  background-color: var(--ev-orange-dark);
+  border-color: var(--ev-orange-dark);
+}
+
+/* ---- Tables ---- */
+.table th {
+  font-weight: 600;
+}
+.table-dark {
+  background-color: var(--ev-black) !important;
+}
+.table-dark th {
+  background-color: var(--ev-black) !important;
+  border-color: #333 !important;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.03em;
+}
+
+/* ---- Badges (EVENTIA palette) ---- */
+.badge {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.badge-ev-reservado {
+  background-color: var(--ev-warning);
+  color: var(--ev-black);
+}
+.badge-ev-confirmado {
+  background-color: var(--ev-info);
+}
+.badge-ev-entregado {
+  background-color: var(--ev-orange);
+}
+.badge-ev-devuelto {
+  background-color: var(--ev-success);
+}
+.badge-ev-cancelado {
+  background-color: var(--ev-danger);
+}
+
+/* ---- Forms ---- */
+.form-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* ---- Alerts ---- */
+.alert-success {
+  background-color: #d1e7dd;
+  border-color: #badbcc;
+  color: #0f5132;
+}
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c2c7;
+  color: #842029;
+}
+.alert-info {
+  background-color: #cff4fc;
+  border-color: #b6effb;
+  color: #055160;
+}
+
+/* ---- Hero / Landing ---- */
+.eventia-hero {
+  background: linear-gradient(135deg, var(--ev-black) 0%, #2a2a2a 100%);
+  color: var(--ev-white);
+  padding: 3rem 2rem;
+  border-radius: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.eventia-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 40%;
+  height: 100%;
+  background: var(--ev-orange);
+  clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+  opacity: 0.15;
+}
+.eventia-hero h1 {
+  font-size: 2.8rem;
+  color: var(--ev-orange);
+}
+.eventia-hero p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* ---- Diagonal accent stripe ---- */
+.eventia-stripe {
+  position: relative;
+  overflow: hidden;
+}
+.eventia-stripe::after {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 120px; height: 120px;
+  background: var(--ev-orange);
+  transform: rotate(45deg);
+  opacity: 0.08;
+}
+
+/* ---- Calendar grid (Disponibilidad) ---- */
+.ev-calendar-card {
+  border: 1px solid var(--ev-cream-dark);
+}
+.ev-calendar-header {
+  background-color: var(--ev-black);
+  color: var(--ev-white);
+  font-family: 'Barlow Condensed', sans-serif;
+}
+.ev-month-nav {
+  background: var(--ev-white);
+  color: var(--ev-black);
+  border: 1px solid #ccc;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 0;
+  text-decoration: none;
+}
+.ev-month-nav:hover {
+  background: var(--ev-cream-dark);
+}
+.ev-month-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+.ev-legend {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+.ev-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.ev-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.ev-dot-available {
+  background-color: var(--ev-success);
+}
+.ev-dot-reserved {
+  background-color: var(--ev-danger);
+}
+.ev-dot-blocked {
+  background-color: var(--ev-gray);
+}
+.ev-calendar-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.ev-calendar-thead th {
+  background-color: var(--ev-black);
+  color: var(--ev-white);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+  padding: 8px 4px;
+  border: 1px solid #333;
+}
+.ev-cell {
+  vertical-align: middle;
+  height: 85px;
+  padding: 6px 4px;
+  border: 1px solid #ddd !important;
+  position: relative;
+  transition: background-color 0.15s;
+}
+.ev-calendar-table td.ev-cell {
+  border: 1px solid #ddd !important;
+}
+table.ev-calendar-table td.ev-cell-empty {
+  background-color: var(--ev-cream) !important;
+}
+table.ev-calendar-table td.ev-cell-inactive {
+  background-color: #fafafa !important;
+}
+table.ev-calendar-table td.ev-cell-available {
+  background-color: #d1e7dd !important;
+}
+table.ev-calendar-table td.ev-cell-available:hover {
+  background-color: #b6d4a8 !important;
+}
+table.ev-calendar-table td.ev-cell-partial {
+  background-color: #fff3cd !important;
+}
+table.ev-calendar-table td.ev-cell-nostock {
+  background-color: #f8d7da !important;
+}
+table.ev-calendar-table td.ev-cell-today {
+  outline: 2px solid var(--ev-danger);
+  outline-offset: -2px;
+}
+table.ev-calendar-table td.ev-cell-blocked {
+  background-color: #e2d8cc !important;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 5px,
+    #ccc 5px,
+    #ccc 6px
+  ) !important;
+}
+table.ev-calendar-table td.ev-cell-blocked:hover {
+  opacity: 0.85;
+}
+.ev-day-num {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+.ev-day-status {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--ev-black);
+}
+.ev-btn-bloquear {
+  font-size: 0.68rem;
+  padding: 1px 8px;
+  color: var(--ev-danger);
+  border: 1px solid var(--ev-danger);
+  background: transparent;
+  border-radius: 4px;
+}
+.ev-btn-bloquear:hover {
+  background: var(--ev-danger);
+  color: var(--ev-white);
+}
+.btn-xs {
+  padding: 0.15rem 0.4rem;
+  font-size: 0.7rem;
+}
+/* Modal Desbloquear */
+.ev-modal {
+  border-radius: 12px;
+  border: 2px solid var(--ev-black);
+}
+.ev-btn-desbloquear {
+  background-color: var(--ev-orange);
+  color: var(--ev-white);
+  border: none;
+  padding: 8px 20px;
+  font-weight: 600;
+  border-radius: 6px;
+}
+.ev-btn-desbloquear:hover {
+  background-color: var(--ev-orange-dark);
+  color: var(--ev-white);
+}
+.ev-btn-cerrar {
+  background-color: var(--ev-white);
+  color: var(--ev-black);
+  border: 2px solid var(--ev-black);
+  padding: 8px 20px;
+  font-weight: 600;
+  border-radius: 6px;
+}
+.ev-btn-cerrar:hover {
+  background-color: var(--ev-black);
+  color: var(--ev-white);
+}
+
+/* ---- Pagination ---- */
+.pagination .page-item.active .page-link {
+  background-color: var(--ev-orange);
+  border-color: var(--ev-orange);
+}
+.pagination .page-link {
+  color: var(--ev-black);
+}
+.pagination .page-link:hover {
+  background-color: var(--ev-cream-dark);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .eventia-hero h1 { font-size: 2rem; }
+  .ev-cell { height: 60px; }
+}

@@ -1,0 +1,162 @@
+@model EVENTIA.ViewModels.ReporteViewModel
+@{ ViewData["Title"] = "Reportes"; }
+
+<h2>Reportes de Pedidos</h2>
+
+<form asp-action="Index" method="get" class="card p-3 mb-4 shadow-sm">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-2">
+            <label class="form-label">Fecha inicio</label>
+            <input type="date" name="fechaInicio" value="@(Model.FechaInicio?.ToString("yyyy-MM-dd"))" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Fecha fin</label>
+            <input type="date" name="fechaFin" value="@(Model.FechaFin?.ToString("yyyy-MM-dd"))" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Estado</label>
+            <select name="estado" class="form-select">
+                <option value="">Todos</option>
+                <option value="Reservado" selected="@(Model.FiltroEstado == "Reservado")">Reservado</option>
+                <option value="Confirmado" selected="@(Model.FiltroEstado == "Confirmado")">Confirmado</option>
+                <option value="Entregado" selected="@(Model.FiltroEstado == "Entregado")">Entregado</option>
+                <option value="Devuelto" selected="@(Model.FiltroEstado == "Devuelto")">Devuelto</option>
+                <option value="Cancelado" selected="@(Model.FiltroEstado == "Cancelado")">Cancelado</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Articulo</label>
+            <select name="articuloId" class="form-select">
+                <option value="">Todos</option>
+                @foreach (var art in Model.Articulos)
+                {
+                    <option value="@art.ArticuloId" selected="@(Model.FiltroArticuloId == art.ArticuloId)">@art.Nombre</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-dark me-2">Filtrar</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+        </div>
+    </div>
+</form>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="text-muted">Total Pedidos</h5>
+                <h2>@Model.TotalRegistros</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="text-muted">Ingresos Totales</h5>
+                <h2>S/ @Model.IngresosTotales.ToString("F2")</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="text-muted">Confirmados</h5>
+                <h2>@Model.Pedidos.Count(p => p.Estado == "Confirmado")</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h5 class="text-muted">Entregados</h5>
+                <h2>@Model.Pedidos.Count(p => p.Estado == "Entregado")</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p class="text-muted mb-2">
+    Mostrando @(Model.PedidosPagina.Any() ? ((Model.PaginaActual - 1) * Model.TamanoPagina + 1) : 0)
+    - @(Math.Min(Model.PaginaActual * Model.TamanoPagina, Model.TotalRegistros))
+    de @Model.TotalRegistros registros
+</p>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Fecha Evento</th>
+                <th>Articulos</th>
+                <th>Monto</th>
+                <th>Estado</th>
+                <th>Registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.PedidosPagina)
+            {
+                <tr>
+                    <td>@p.PedidoId</td>
+                    <td>@p.Cliente.ClienteNavigation.Nombre</td>
+                    <td>@p.FechaEvento.ToString("dd/MM/yyyy")</td>
+                    <td>@p.DetallePedidos.Count()</td>
+                    <td>S/ @p.MontoTotal.ToString("F2")</td>
+                    <td><span class="badge @GetEstadoBadge(p.Estado)">@p.Estado</span></td>
+                    <td>@p.FechaPedido.ToString("dd/MM/yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPaginas > 1)
+{
+    <nav>
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.PaginaActual <= 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pagina="@(Model.PaginaActual - 1)"
+                   asp-route-fechaInicio="@(Model.FechaInicio?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaFin="@(Model.FechaFin?.ToString("yyyy-MM-dd"))"
+                   asp-route-estado="@Model.FiltroEstado"
+                   asp-route-articuloId="@Model.FiltroArticuloId">Anterior</a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPaginas; i++)
+            {
+                <li class="page-item @(i == Model.PaginaActual ? "active" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-pagina="@i"
+                       asp-route-fechaInicio="@(Model.FechaInicio?.ToString("yyyy-MM-dd"))"
+                       asp-route-fechaFin="@(Model.FechaFin?.ToString("yyyy-MM-dd"))"
+                       asp-route-estado="@Model.FiltroEstado"
+                       asp-route-articuloId="@Model.FiltroArticuloId">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.PaginaActual >= Model.TotalPaginas ? "disabled" : "")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pagina="@(Model.PaginaActual + 1)"
+                   asp-route-fechaInicio="@(Model.FechaInicio?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaFin="@(Model.FechaFin?.ToString("yyyy-MM-dd"))"
+                   asp-route-estado="@Model.FiltroEstado"
+                   asp-route-articuloId="@Model.FiltroArticuloId">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+}
+
+@functions {
+    string GetEstadoBadge(string estado) => estado switch
+    {
+        "Reservado" => "badge-ev-reservado",
+        "Confirmado" => "badge-ev-confirmado",
+        "Entregado" => "badge-ev-entregado",
+        "Devuelto" => "badge-ev-devuelto",
+        "Cancelado" => "badge-ev-cancelado",
+        _ => "bg-secondary"
+    };
+}

@@ -1,0 +1,70 @@
+@model EVENTIA.Dtos.RegistroDto
+@{ ViewData["Title"] = "Registro"; }
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4">Registro de Usuario</h3>
+
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <form asp-action="Registro" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label">Nombre completo</label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Correo" class="form-label">Correo</label>
+                        <input asp-for="Correo" class="form-control" type="email" />
+                        <span asp-validation-for="Correo" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Contrasena" class="form-label">Contraseña</label>
+                        <input asp-for="Contrasena" class="form-control" type="password" />
+                        <span asp-validation-for="Contrasena" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Telefono" class="form-label">Teléfono</label>
+                        <input asp-for="Telefono" class="form-control" />
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TipoPerfil" class="form-label">Tipo de perfil</label>
+                        <select asp-for="TipoPerfil" class="form-select">
+                            <option value="">-- Seleccione --</option>
+                            <option value="Cliente">Cliente</option>
+                            <option value="Proveedor">Proveedor</option>
+                        </select>
+                        <span asp-validation-for="TipoPerfil" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3" id="fieldsCliente" style="display:none;">
+                        <label asp-for="Direccion" class="form-label">Dirección</label>
+                        <input asp-for="Direccion" class="form-control" />
+                    </div>
+                    <div class="mb-3" id="fieldsProveedor" style="display:none;">
+                        <label asp-for="NombreNegocio" class="form-label">Nombre del negocio</label>
+                        <input asp-for="NombreNegocio" class="form-control" />
+                        <label asp-for="Direccion" class="form-label mt-2">Dirección</label>
+                        <input asp-for="Direccion" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100">Registrarme</button>
+                </form>
+
+                <hr />
+                <p class="text-center">¿Ya tienes cuenta? <a asp-action="Login">Inicia sesión</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('TipoPerfil').addEventListener('change', function () {
+            document.getElementById('fieldsCliente').style.display = this.value === 'Cliente' ? 'block' : 'none';
+            document.getElementById('fieldsProveedor').style.display = this.value === 'Proveedor' ? 'block' : 'none';
+        });
+    </script>
+}

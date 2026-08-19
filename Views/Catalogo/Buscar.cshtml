@@ -1,0 +1,90 @@
+@model EVENTIA.ViewModels.BuscarCatalogoViewModel
+@{ ViewData["Title"] = "Buscar en Catálogo"; }
+
+<h2>Catálogo de Artículos</h2>
+
+<form asp-action="Buscar" method="get" class="card p-3 mb-4 shadow-sm">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Buscar</label>
+            <input type="text" name="buscar" value="@Model.Buscar" class="form-control" placeholder="Nombre del artículo..." />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Categoría</label>
+            <select name="categoriaId" class="form-select">
+                <option value="">Todas</option>
+                @foreach (var cat in Model.Categorias)
+                {
+                    <option value="@cat.CategoriaId" selected="@(Model.CategoriaId == cat.CategoriaId)">@cat.Nombre</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Fecha</label>
+            <input type="date" name="fecha" value="@(Model.FechaEvento?.ToString("yyyy-MM-dd"))" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Proveedor</label>
+            <select name="proveedorId" class="form-select">
+                <option value="">Todos</option>
+                @foreach (var p in Model.Proveedores)
+                {
+                    <option value="@p.ProveedorId" selected="@(Model.ProveedorId == p.ProveedorId)">@p.NombreNegocio</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-dark me-2">Buscar</button>
+            <a asp-action="Buscar" class="btn btn-outline-secondary">Limpiar</a>
+        </div>
+    </div>
+</form>
+
+@if (!Model.Articulos.Any())
+{
+    <div class="alert alert-info">No se encontraron artículos con los filtros seleccionados.</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        @foreach (var item in Model.Articulos)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                    {
+                        <img src="@item.ImagenUrl" class="card-img-top" alt="@item.Nombre" style="height:200px; object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+                            <span class="text-muted">Sin imagen</span>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Nombre</h5>
+                        <p class="card-text text-muted small">@item.CategoriaNombre</p>
+                        <p class="card-text fw-bold">S/ @item.Precio.ToString("F2") / dia</p>
+                        <p class="card-text small text-secondary">Stock: @item.CantidadTotal | Proveedor: @item.ProveedorNombre</p>
+                        @if (Model.FechaEvento.HasValue && item.DisponibleParaFecha.HasValue)
+                        {
+                            if (item.DisponibleParaFecha.Value)
+                            {
+                                <span class="badge bg-success">Disponible (@item.CantidadDisponible uds)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Sin stock</span>
+                            }
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <a asp-action="Detalle" asp-route-id="@item.ArticuloId"
+                           asp-route-fecha="@(Model.FechaEvento?.ToString("yyyy-MM-dd"))"
+                           class="btn btn-sm btn-outline-dark w-100">Ver Detalle</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

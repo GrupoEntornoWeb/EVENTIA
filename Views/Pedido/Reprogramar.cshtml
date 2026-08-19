@@ -1,0 +1,43 @@
+@model EVENTIA.ViewModels.ReprogramarViewModel
+@{ ViewData["Title"] = "Reprogramar Pedido"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Reprogramar Pedido #@Model.PedidoId</h2>
+    <a asp-action="Detalle" asp-route-id="@Model.PedidoId" class="btn btn-outline-secondary">← Volver</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Reprogramar Fecha del Evento</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p><strong>Pedido:</strong> #@Model.PedidoId</p>
+                    <p><strong>Proveedor:</strong> @Model.ProveedorNombre</p>
+                    <p><strong>Fecha actual:</strong> @Model.FechaActual.ToString("dd/MM/yyyy")</p>
+                </div>
+
+                <form asp-action="Reprogramar" method="post">
+                    <input type="hidden" name="PedidoId" value="@Model.PedidoId" />
+                    <input type="hidden" name="FechaActual" value="@Model.FechaActual.ToString("yyyy-MM-dd")" />
+
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Nueva fecha del evento</strong></label>
+                        <input type="date" name="NuevaFecha" class="form-control" required
+                               min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning"
+                                onclick="return confirm('Confirmar reprogramación del pedido?')">
+                            Reprogramar
+                        </button>
+                        <a asp-action="Detalle" asp-route-id="@Model.PedidoId" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

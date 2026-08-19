@@ -1,0 +1,77 @@
+@model EVENTIA.ViewModels.CarritoViewModel
+@{ ViewData["Title"] = "Mi Carrito"; }
+
+<h2>Mi Carrito de Compras</h2>
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-info">
+        Tu carrito está vacío. <a asp-controller="Catalogo" asp-action="Buscar">Explora el catálogo</a> para agregar artículos.
+    </div>
+}
+else
+{
+    @if (Model.ProveedorNombre != null)
+    {
+        <p class="text-muted">Proveedor: <strong>@Model.ProveedorNombre</strong></p>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Artículo</th>
+                    <th>Precio Unitario</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="d-flex align-items-center gap-2">
+                            @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                            {
+                                <img src="@item.ImagenUrl" alt="@item.Nombre" style="width:50px; height:50px; object-fit:cover; border-radius:6px;" />
+                            }
+                            <span>@item.Nombre</span>
+                        </td>
+                        <td>S/ @item.PrecioUnitario.ToString("F2")</td>
+                        <td>
+                            <form asp-action="Actualizar" method="post" class="d-flex align-items-center gap-1">
+                                <input type="hidden" name="articuloId" value="@item.ArticuloId" />
+                                <button type="submit" name="cantidad" value="@(item.Cantidad - 1)" class="btn btn-sm btn-outline-secondary">-</button>
+                                <span class="mx-2 fw-bold">@item.Cantidad</span>
+                                <button type="submit" name="cantidad" value="@(item.Cantidad + 1)" class="btn btn-sm btn-outline-secondary">+</button>
+                            </form>
+                        </td>
+                        <td>S/ @item.Subtotal.ToString("F2")</td>
+                        <td>
+                            <form asp-action="Eliminar" method="post">
+                                <input type="hidden" name="articuloId" value="@item.ArticuloId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">X</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="table-dark">
+                    <td colspan="3" class="text-end fw-bold">Total:</td>
+                    <td class="fw-bold fs-5">S/ @Model.MontoTotal.ToString("F2")</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+        <a asp-action="SeleccionarFecha" class="btn btn-success btn-lg">Continuar -> Seleccionar Fecha</a>
+        <form asp-action="Vaciar" method="post">
+            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Vacias todo el carrito?')">Vaciar Carrito</button>
+        </form>
+        <a asp-controller="Catalogo" asp-action="Buscar" class="btn btn-outline-secondary">Seguir Comprando</a>
+    </div>
+}

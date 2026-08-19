@@ -1,0 +1,199 @@
+@model EVENTIA.ViewModels.DisponibilidadViewModel
+@{ ViewData["Title"] = "Gestionar Disponibilidad"; }
+
+<h2>Disponibilidad de Artículos</h2>
+
+<form asp-action="Index" method="get" class="card p-3 mb-4 shadow-sm">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label">Seleccionar artículo</label>
+            <select name="articuloId" class="form-select">
+                <option value="">-- Seleccione un artículo --</option>
+                @foreach (var art in Model.Articulos)
+                {
+                    <option value="@art.ArticuloId" selected="@(Model.ArticuloSeleccionadoId == art.ArticuloId)">@art.Nombre</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-dark">Ver Calendario</button>
+        </div>
+    </div>
+</form>
+
+@if (Model.ArticuloSeleccionado != null)
+{
+    var dispDict = Model.Disponibilidades.ToDictionary(d => d.Fecha);
+    var hoy = DateOnly.FromDateTime(DateTime.Today);
+    var mesActual = Model.FechaInicio.HasValue ? Model.FechaInicio.Value.Month : hoy.Month;
+    var anioActual = Model.FechaInicio.HasValue ? Model.FechaInicio.Value.Year : hoy.Year;
+    var primerDia = new DateOnly(anioActual, mesActual, 1);
+    var diasEnMes = DateTime.DaysInMonth(anioActual, mesActual);
+    var diaSemanaInicio = ((int)primerDia.DayOfWeek + 6) % 7;
+
+    var mesAnterior = mesActual == 1 ? 12 : mesActual - 1;
+    var anioAnterior = mesActual == 1 ? anioActual - 1 : anioActual;
+    var mesSiguiente = mesActual == 12 ? 1 : mesActual + 1;
+    var anioSiguiente = mesActual == 12 ? anioActual + 1 : anioActual;
+    var fechaAnterior = $"{anioAnterior}-{mesAnterior:D2}-01";
+    var fechaSiguiente = $"{anioSiguiente}-{mesSiguiente:D2}-01";
+
+    var nombresMes = new[] { "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+
+    <div class="card shadow ev-calendar-card">
+        <div class="card-header ev-calendar-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">@Model.ArticuloSeleccionado.Nombre</h5>
+            <div class="d-flex align-items-center gap-2">
+                <a asp-action="Index"
+                   asp-route-articuloId="@Model.ArticuloSeleccionadoId"
+                   asp-route-fechaInicio="@fechaAnterior"
+                   class="btn btn-sm ev-month-nav">&lsaquo;</a>
+                <span class="ev-month-label">@nombresMes[mesActual] @anioActual</span>
+                <a asp-action="Index"
+                   asp-route-articuloId="@Model.ArticuloSeleccionadoId"
+                   asp-route-fechaInicio="@fechaSiguiente"
+                   class="btn btn-sm ev-month-nav">&rsaquo;</a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Disponibilidades.Any())
+            {
+                <div class="ev-legend mb-3">
+                    <span class="ev-legend-item"><span class="ev-dot ev-dot-available"></span> Disponible (D)</span>
+                    <span class="ev-legend-item"><span class="ev-dot ev-dot-reserved"></span> Reservada (R)</span>
+                    <span class="ev-legend-item"><span class="ev-dot ev-dot-blocked"></span> Bloqueada</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center ev-calendar-table">
+                        <thead>
+                            <tr class="ev-calendar-thead">
+                                <th>LUN</th>
+                                <th>MAR</th>
+                                <th>MIE</th>
+                                <th>JUE</th>
+                                <th>VIE</th>
+                                <th>SAB</th>
+                                <th>DOM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var dia = 1;
+                                var totalCeldas = diaSemanaInicio + diasEnMes;
+                                var filas = (int)Math.Ceiling(totalCeldas / 7.0);
+                            }
+                            @for (var fila = 0; fila < filas; fila++)
+                            {
+                                <tr>
+                                    @for (var col = 0; col < 7; col++)
+                                    {
+                                        var indice = fila * 7 + col;
+                                        if (indice < diaSemanaInicio || dia > diasEnMes)
+                                        {
+                                            <td class="ev-cell ev-cell-empty"></td>
+                                        }
+                                        else
+                                        {
+                                            var fecha = new DateOnly(anioActual, mesActual, dia);
+                                            var esHoy = fecha == hoy;
+                                            var tieneDisp = dispDict.ContainsKey(fecha);
+                                            var disp = tieneDisp ? dispDict[fecha] : null;
+
+                                            var dispCantidad = disp != null ? disp.CantidadDisponible : 0;
+                                            var reservada = disp != null ? disp.CantidadReservada : 0;
+                                            var esBloqueada = tieneDisp && dispCantidad == 0 && reservada > 0;
+
+                                            var esSinStock = tieneDisp && dispCantidad == 0 && reservada == 0;
+
+                                            var claseCelda = "";
+                                            if (esBloqueada) claseCelda = "ev-cell-blocked";
+                                            else if (esSinStock) claseCelda = "ev-cell-nostock";
+                                            else if (tieneDisp && reservada > 0) claseCelda = "ev-cell-partial";
+                                            else if (tieneDisp) claseCelda = "ev-cell-available";
+                                            else claseCelda = "ev-cell-inactive";
+
+                                            var claseHoy = esHoy ? "ev-cell-today" : "";
+                                            var cellId = $"cell-{fecha.ToString("yyyy-MM-dd")}";
+
+                                            <td class="ev-cell @claseCelda @claseHoy"
+                                                id="@cellId"
+                                                data-fecha="@fecha.ToString("yyyy-MM-dd")"
+                                                data-articulo="@Model.ArticuloSeleccionadoId"
+                                                data-bloqueada="@(esBloqueada ? "true" : "false")">
+                                                <div class="ev-day-num">@dia</div>
+                                                @if (tieneDisp)
+                                                {
+                                                    <div class="ev-day-status @(esBloqueada ? "text-muted" : "")">
+                                                        D @dispCantidad &middot; R @reservada
+                                                    </div>
+                                                    @if (!esBloqueada && dispCantidad > 0 && reservada == 0)
+                                                    {
+                                                        <form asp-action="BloquearFecha"
+                                                              asp-route-articuloId="@Model.ArticuloSeleccionadoId"
+                                                              asp-route-fecha="@fecha.ToString("yyyy-MM-dd")"
+                                                              method="post" class="mt-1">
+                                                            <button type="submit" class="btn btn-xs ev-btn-bloquear"
+                                                                    onclick="return confirm('Bloquear esta fecha?')">Bloquear</button>
+                                                        </form>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <div class="ev-day-status text-muted">--</div>
+                                                }
+                                            </td>
+                                            dia++;
+                                        }
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info mb-0">
+                    No hay registros de disponibilidad para este artículo en este mes.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Modal Desbloquear -->
+    <div class="modal fade" id="modalDesbloquear" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ev-modal">
+                <div class="modal-body text-center py-4">
+                    <h5 class="fw-bold mb-2" id="modalFecha"></h5>
+                    <p class="mb-4">Esta fecha ya está bloqueada para nuevas reservas.</p>
+                    <form id="formDesbloquear" method="post" asp-action="DesbloquearFecha" class="d-inline">
+                        <input type="hidden" name="articuloId" value="@Model.ArticuloSeleccionadoId" />
+                        <input type="hidden" name="fecha" id="modalFechaInput" />
+                        <button type="submit" class="btn ev-btn-desbloquear me-2">Desbloquear fecha</button>
+                    </form>
+                    <button type="button" class="btn ev-btn-cerrar" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.ev-cell-blocked').forEach(function (cell) {
+            cell.style.cursor = 'pointer';
+            cell.addEventListener('click', function () {
+                var fecha = this.getAttribute('data-fecha');
+                var partes = fecha.split('-');
+                var meses = ['', 'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
+                             'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+                var mes = meses[parseInt(partes[1], 10)];
+                document.getElementById('modalFecha').textContent = mes + ' ' + parseInt(partes[2], 10) + ' · ' + partes[0];
+                document.getElementById('modalFechaInput').value = fecha;
+                var modal = new bootstrap.Modal(document.getElementById('modalDesbloquear'));
+                modal.show();
+            });
+        });
+    </script>
+}

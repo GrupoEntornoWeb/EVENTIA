@@ -1,0 +1,55 @@
+﻿@{ ViewData["Title"] = "EVENTIA"; }
+
+<div class="eventia-hero text-center mb-5">
+    <h1 class="display-3 fw-bold">EVENTIA</h1>
+    <p class="lead fs-4 mb-3">Plataforma de Alquiler de Equipos para Eventos</p>
+    <hr class="w-50 mx-auto my-4 border-light" />
+    <p class="fs-5">Encuentra todo lo que necesitas para tu evento: sillas, mesas, toldos, sonido, iluminacion y mas.</p>
+</div>
+
+<div class="row g-4 justify-content-center mb-5">
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm h-100 border-0 eventia-stripe">
+            <div class="card-body">
+                <h4 class="eventia-heading" style="color: var(--ev-black);">Catalogo Completo</h4>
+                <p class="text-muted">Explora mas de 30 articulos de 10 categorias diferentes con disponibilidad en tiempo real.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm h-100 border-0 eventia-stripe">
+            <div class="card-body">
+                <h4 class="eventia-heading" style="color: var(--ev-black);">Reserva Facil</h4>
+                <p class="text-muted">Selecciona tus articulos, elige la fecha de tu evento y confirma tu pedido en minutos.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm h-100 border-0 eventia-stripe">
+            <div class="card-body">
+                <h4 class="eventia-heading" style="color: var(--ev-black);">Gestion Total</h4>
+                <p class="text-muted">Seguimiento de pagos, entregas, devoluciones y reportes para proveedores y clientes.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    @if (Context.Session.GetString("Nombre") == null)
+    {
+        <a asp-controller="Cuenta" asp-action="Login" class="btn btn-primary btn-lg me-2" style="background-color: var(--ev-orange); border-color: var(--ev-orange);">Iniciar Sesion</a>
+        <a asp-controller="Cuenta" asp-action="Registro" class="btn btn-outline-dark btn-lg">Crear Cuenta</a>
+    }
+    else
+    {
+        var tipo = Context.Session.GetString("TipoPerfil");
+        if (tipo == "Cliente")
+        {
+            <a asp-controller="Catalogo" asp-action="Buscar" class="btn btn-primary btn-lg" style="background-color: var(--ev-orange); border-color: var(--ev-orange);">Explorar Catalogo</a>
+        }
+        else
+        {
+            <a asp-controller="MiCatalogo" asp-action="Index" class="btn btn-primary btn-lg" style="background-color: var(--ev-orange); border-color: var(--ev-orange);">Mi Catalogo</a>
+        }
+    }
+</div>
